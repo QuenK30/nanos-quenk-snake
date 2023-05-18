@@ -1,0 +1,1 @@
+MAP_SIZE = 5000 -- 15000 is the default map size with default map asset pack. change with ur own size if u use custom map asset pack (Ur map need to be closed)
