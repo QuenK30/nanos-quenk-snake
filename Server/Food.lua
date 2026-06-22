@@ -1,42 +1,22 @@
 --[[
     Project: "NanosSnake"
-    Date: 14.05.2023
+    Date: 08.05.2023
     Description: Gamemode for NanosWorld - Snake
     Author: QuenK
 ]]--
-Package.Require("Config.lua")
 
--- create table for timer
-TimeFood = {
-    name,
-    time
-}
-
-function createFood(x, y, z)
-    local food = StaticMesh(Vector(x,y,z), Rotator(), "snake::SM_Mushroom")
+local function spawnFood()
+    local x = math.random(-MAP_SIZE / 2, MAP_SIZE / 2)
+    local y = math.random(-MAP_SIZE / 2, MAP_SIZE / 2)
+    local food = StaticMesh(Vector(x, y, 0), Rotator(), "nanos-quenk-snake-asset::SM_Mushroom")
     food:SetValue("IsFood", true)
 end
 
-function spawnFood()
-    local map_size = Vector(MAP_SIZE, MAP_SIZE, MAP_SIZE)
-    local randomX = math.random(-map_size.X / 2, map_size.X / 2)
-    local randomY = math.random(-map_size.Y / 2, map_size.Y / 2)
-    createFood(randomX, randomY, 0)
+local function foodLoop()
+    spawnFood()
+    Timer.SetTimeout(foodLoop, math.random(FOOD_SPAWN_MIN_SEC, FOOD_SPAWN_MAX_SEC) * 1000)
 end
 
-function randomSpawnFood(player)
-    local randomTime = math.random(2, 6)
-    local T = Timer.SetTimeout(spawnFood, randomTime * 1000)
-    TimeFood.name = player:GetName()
-    TimeFood.time = T
-end
-
-function stopTimerFood()
-    for _, player in pairs(Player.GetAll()) do
-        if player:GetName() == TimeFood.name then
-            if TimeFood.time then
-                Timer.ClearTimeout(TimeFood.time)
-            end
-        end
-    end
-end
+Server.Subscribe("Start", function()
+    foodLoop()
+end)

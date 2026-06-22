@@ -13,15 +13,17 @@ Input.Register("Turn Right", "D")
 Input.Bind("Turn Right", InputEvent.Pressed, function() Events.CallRemote("Snake:KeyPress", PLAYER_DIR_RIGHT) end)
 Input.Bind("Turn Right", InputEvent.Released, function() Events.CallRemote("Snake:KeyRelease", PLAYER_DIR_RIGHT) end)
 
+-- Pre-calculated once — avoids allocating new Vector/Rotator every Tick frame
+local CAM_OFFSET = Vector(CAM_FORWARD_OFFSET, 0, CAM_HEIGHT)
+local CAM_ROT = Rotator(CAM_PITCH, 0, 0)
+
 Client.Subscribe("Tick", function()
-    local pPlayer = Client.GetLocalPlayer()
-    if not pPlayer then return end
+    local player = Client.GetLocalPlayer()
+    if not player then return end
 
-    local eSnake = pPlayer:GetControl()
-    if not eSnake then return end
+    local snake = player:GetControl()
+    if not snake then return end
 
-    local tSnakeLoc = eSnake:GetLocation()
-    local tCamLoc = tSnakeLoc + Vector(0, 0, 4000)
-    pPlayer:SetCameraLocation(tCamLoc + Vector(-900, 0, 0))
-    pPlayer:SetCameraRotation(Rotator(-90, 0, 0))
+    player:SetCameraLocation(snake:GetLocation() + CAM_OFFSET)
+    player:SetCameraRotation(CAM_ROT)
 end)

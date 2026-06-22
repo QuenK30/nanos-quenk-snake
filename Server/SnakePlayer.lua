@@ -5,18 +5,18 @@
     Author: QuenK
 ]]--
 
-function SnakeClass:Constructor(sPlayer, pos, rot)
-    if not sPlayer or not sPlayer:IsValid() then return end
-    self.Super:Constructor(tPos or Vector(), tRot or Rotator(), "snake::SM_SnakeHead")
-    self:SetRotation(Rotator(0, 90, 0))
-    self.speed = 900
+function SnakeClass:Constructor(player, pos, rot)
+    if not player or not player:IsValid() then return end
+    self.Super:Constructor(pos or Vector(), rot or Rotator(), "nanos-quenk-snake-asset::SM_SnakeHead")
+    self:SetRotation(Rotator(0, SNAKE_INITIAL_YAW, 0))
+    self.speed = SNAKE_SPEED
     self.body_parts = {}
-    self.player = sPlayer
-    sPlayer:SetValue("controlsnake", self, true)
+    self.player = player
+    player:SetValue("controlsnake", self, true)
 end
 
-function SnakeClass:SetSpeed(sSpeed)
-    self.speed = sSpeed
+function SnakeClass:SetSpeed(speed)
+    self.speed = speed
 end
 
 function SnakeClass:GetSpeed()
@@ -28,78 +28,62 @@ function SnakeClass:GetPlayer()
 end
 
 function SnakeClass:AddBodyPart()
-    local sPart = StaticMesh(Vector(), Rotator(), "snake::SM_SnakeTail")
-    sPart:SetValue("pQueue", self:GetPlayer(), true)
-    sPart:SetScale(Vector(0.7))
+    local part = StaticMesh(Vector(), Rotator(), "nanos-quenk-snake-asset::SM_SnakeTail")
+    part:SetValue("pQueue", self:GetPlayer(), true)
+    part:SetScale(Vector(SNAKE_BODY_SCALE))
 
-    if (#self.body_parts >= 1) then
-        sPart:SetRotation(self.body_parts[#self.body_parts]:GetRotation())
-        sPart:SetLocation(self.body_parts[#self.body_parts]:GetLocation())
+    if #self.body_parts >= 1 then
+        part:SetRotation(self.body_parts[#self.body_parts]:GetRotation())
+        part:SetLocation(self.body_parts[#self.body_parts]:GetLocation())
     else
-        sPart:SetRotation(self:GetRotation())
-        sPart:SetLocation(self:GetLocation())
+        part:SetRotation(self:GetRotation())
+        part:SetLocation(self:GetLocation())
     end
 
-    self.body_parts[#self.body_parts + 1] = sPart
-
+    self.body_parts[#self.body_parts + 1] = part
     self:UpdateBody()
 end
 
-function SnakeClass:RemoveLastBodyPart()
-    local sTails = #self.body_parts
-    if (sTails <= 0) then return end
+function SnakeClass:UpdateBody(delta)
+    local body = self:GetBody()
+    local moveTime = self:GetSpeed() / 100
+    delta = delta or 0.0001
 
-    self.body_parts[sTails]:Destroy()
-    self.body_parts[sTails] = nil
-
-    self:UpdateBody()
-end
-
-function SnakeClass:UpdateBody(fDelta)
-    local tBody = self:GetBody()
-    local iSpeed = self:GetSpeed()
-    local fMoveTime = (iSpeed / 100)
-
-    fDelta = (fDelta or 0.0001)
-
-    for iID, ePart in ipairs(tBody) do
-        local ePrevPart = tBody[iID - 1] and tBody[iID - 1] or self
-
-        ePart:SetLocation(NanosMath.VInterpTo(ePart:GetLocation(), ePrevPart:GetLocation(), fDelta, fMoveTime))
-        ePart:SetRotation(NanosMath.RInterpTo(ePart:GetRotation(), ePrevPart:GetRotation(), fDelta, fMoveTime))
+    for i, part in ipairs(body) do
+        local prevPart = body[i - 1] or self
+        part:SetLocation(NanosMath.VInterpTo(part:GetLocation(), prevPart:GetLocation(), delta, moveTime))
+        part:SetRotation(NanosMath.RInterpTo(part:GetRotation(), prevPart:GetRotation(), delta, moveTime))
     end
 end
-
 
 function SnakeClass:GetBody()
     return self.body_parts
 end
 
-Server.Subscribe("Tick", function(fDelta)
-    for _, v in ipairs(SnakeClass.GetAll()) do
-        local iSpeed = v:GetSpeed()
+Server.Subscribe("Tick", function(delta)
+    for _, snake in ipairs(SnakeClass.GetAll()) do
+        local speed = snake:GetSpeed()
 
-        if v._direction then
-            if v._direction == PLAYER_DIR_LEFT then
-                v:SetRotation(NanosMath.RInterpTo(
-                    v:GetRotation(),
-                    v:GetRotation() + Rotator(0, (fDelta * iSpeed) * -0.5, 0),
-                    fDelta,
+        if snake._direction then
+            if snake._direction == PLAYER_DIR_LEFT then
+                snake:SetRotation(NanosMath.RInterpTo(
+                    snake:GetRotation(),
+                    snake:GetRotation() + Rotator(0, (delta * speed) * -0.5, 0),
+                    delta,
                     10
                 ))
-            elseif v._direction == PLAYER_DIR_RIGHT then
-                v:SetRotation(NanosMath.RInterpTo(
-                    v:GetRotation(),
-                    v:GetRotation() + Rotator(0, (fDelta * iSpeed) * 0.5, 0),
-                    fDelta,
+            elseif snake._direction == PLAYER_DIR_RIGHT then
+                snake:SetRotation(NanosMath.RInterpTo(
+                    snake:GetRotation(),
+                    snake:GetRotation() + Rotator(0, (delta * speed) * 0.5, 0),
+                    delta,
                     10
                 ))
             end
         end
 
-        local tForward = v:GetRotation():GetRightVector() * (fDelta * iSpeed)
-        v:SetLocation(v:GetLocation() + tForward)
-
-        v:UpdateBody(fDelta)
+        local forward = snake:GetRotation():GetRightVector() * (delta * speed)
+        snake:SetLocation(snake:GetLocation() + forward)
+        snake:UpdateBody(delta)
     end
 end)
