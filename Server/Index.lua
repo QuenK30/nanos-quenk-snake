@@ -5,6 +5,7 @@
     Author: QuenK
 ]]--
 
+Package.Require("Database.lua")
 Package.Require("SnakePlayer.lua")
 Package.Require("SnakeEvents.lua")
 Package.Require("Food.lua")
@@ -14,6 +15,7 @@ local killPlayer  -- forward declaration (mutual recursion with spawnPlayerSnake
 local function addScore(player, head)
     player:SetValue("Score", player:GetValue("Score") + 1, true)
     head:AddBodyPart()
+    Events.CallRemote("Snake:Eat", player)
 end
 
 local function spawnPlayerSnake(player)
@@ -59,19 +61,32 @@ killPlayer = function(player)
 
     local trigger = head:GetValue("Trigger")
     if trigger then trigger:Destroy() end
-
     head:Destroy()
-    -- Ne pas respawn immédiatement — attendre que le client confirme via Snake:Respawn
+
+    -- Mise à jour du best score avant d'envoyer l'événement au client
+    local score = player:GetValue("Score", 0)
+    local accountId = player:GetAccountID()
+    UpdatePlayerBestScore(accountId, score)
+    player:SetValue("BestScore", GetPlayerBestScore(accountId), true)
+
     Events.CallRemote("Snake:Died", player)
 end
+
+Events.SubscribeRemote("Snake:StartGame", function(player)
+    spawnPlayerSnake(player)
+end)
 
 Events.SubscribeRemote("Snake:Respawn", function(player)
     spawnPlayerSnake(player)
 end)
 
 Player.Subscribe("Spawn", function(player)
-    spawnPlayerSnake(player)
+    local accountId = player:GetAccountID()
+    local bestScore = GetPlayerBestScore(accountId)
+    player:SetValue("BestScore", bestScore, true)
     Chat.BroadcastMessage("Le joueur <blue>" .. player:GetName() .. "</> a rejoint la partie !")
+    -- Ne pas spawner le serpent ici — attendre que le client envoie Snake:StartGame
+    Events.CallRemote("Snake:Ready", player)
 end)
 
 Server.Subscribe("Start", function()
@@ -79,6 +94,21 @@ Server.Subscribe("Start", function()
 end)
 
 Player.Subscribe("Destroy", function(player)
+    -- Sauvegarder le score si le joueur se déconnecte en pleine partie
+    local score = player:GetValue("Score", 0)
+    if score > 0 then
+        UpdatePlayerBestScore(player:GetAccountID(), score)
+    end
+    -- Nettoyer le serpent actif
+    local head = player:GetValue("Head")
+    if head and head:IsValid() then
+        local trigger = head:GetValue("Trigger")
+        if trigger then trigger:Destroy() end
+        for _, part in ipairs(head:GetBody()) do
+            part:Destroy()
+        end
+        head:Destroy()
+    end
     local char = player:GetControlledCharacter()
     if char then char:Destroy() end
 end)
