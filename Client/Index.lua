@@ -42,43 +42,43 @@ hud:Subscribe("Update", function(self, width, height)
         -- Ligne déco haut
         self:DrawText("✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦", Vector2D(cx - 148, cy - 122), MONO, 13, C_PURPLE)
         -- Titre avec ombre WordArt (shadow d'abord, texte par-dessus)
-        self:DrawText("★   SNAKE   ★", Vector2D(cx - 110 + 3, cy - 98 + 3), MONO, 28, C_PURPLE)
-        self:DrawText("★   SNAKE   ★", Vector2D(cx - 110,     cy - 98    ), MONO, 28, C_YELLOW)
+        self:DrawText(T("UI_TITLE"), Vector2D(cx - 110 + 3, cy - 98 + 3), MONO, 28, C_PURPLE)
+        self:DrawText(T("UI_TITLE"), Vector2D(cx - 110,     cy - 98    ), MONO, 28, C_YELLOW)
         -- Serpent ASCII
         self:DrawText(">───────────────●", Vector2D(cx - 118, cy - 55), MONO, 18, C_LIME)
         -- Best score (masqué si 0)
         if bestScore > 0 then
-            self:DrawText("BEST >>  " .. fmtScore(bestScore), Vector2D(cx - 95, cy - 6), MONO, 16, C_CYAN)
+            self:DrawText(T("UI_BEST", fmtScore(bestScore)), Vector2D(cx - 95, cy - 6), MONO, 16, C_CYAN)
         end
         -- Ligne déco bas
         self:DrawText("✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦", Vector2D(cx - 148, cy + 26), MONO, 13, C_PINK)
         -- Prompt
-        self:DrawText(">>> PRESS ENTER <<<", Vector2D(cx - 128, cy + 53), MONO, 17, C_ORANGE)
+        self:DrawText(T("UI_PRESS_ENTER"), Vector2D(cx - 128, cy + 53), MONO, 17, C_ORANGE)
         return
     end
 
     -- ── Écran de mort ─────────────────────────────────────────────────────────
     if isDead then
         -- GAME OVER avec ombre rouge/orange
-        self:DrawText("*~*  GAME OVER  *~*", Vector2D(cx - 148 + 3, cy - 96 + 3), MONO, 24, C_ORANGE)
-        self:DrawText("*~*  GAME OVER  *~*", Vector2D(cx - 148,     cy - 96    ), MONO, 24, C_RED)
+        self:DrawText(T("UI_GAME_OVER"), Vector2D(cx - 148 + 3, cy - 96 + 3), MONO, 24, C_ORANGE)
+        self:DrawText(T("UI_GAME_OVER"), Vector2D(cx - 148,     cy - 96    ), MONO, 24, C_RED)
         -- Scores
-        self:DrawText("SCORE  >>  " .. fmtScore(deathScore), Vector2D(cx - 118, cy - 43), MONO, 16, C_CYAN)
-        self:DrawText("BEST   >>  " .. fmtScore(bestScore),  Vector2D(cx - 118, cy - 17), MONO, 16, C_YELLOW)
+        self:DrawText(T("UI_SCORE",      fmtScore(deathScore)), Vector2D(cx - 118, cy - 43), MONO, 16, C_CYAN)
+        self:DrawText(T("UI_BEST_DEATH", fmtScore(bestScore)),  Vector2D(cx - 118, cy - 17), MONO, 16, C_YELLOW)
         -- Nouveau record
         if deathScore > 0 and deathScore >= bestScore then
-            self:DrawText("!! NEW RECORD !!", Vector2D(cx - 108 + 2, cy + 19 + 2), MONO, 15, C_PURPLE)
-            self:DrawText("!! NEW RECORD !!", Vector2D(cx - 108,     cy + 19    ), MONO, 15, C_PINK)
+            self:DrawText(T("UI_NEW_RECORD"), Vector2D(cx - 108 + 2, cy + 19 + 2), MONO, 15, C_PURPLE)
+            self:DrawText(T("UI_NEW_RECORD"), Vector2D(cx - 108,     cy + 19    ), MONO, 15, C_PINK)
         end
         -- Ligne déco
         self:DrawText("✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦", Vector2D(cx - 148, cy + 49), MONO, 13, C_PURPLE)
         -- Prompt
-        self:DrawText(">>> PRESS ENTER <<<", Vector2D(cx - 128, cy + 76), MONO, 17, C_ORANGE)
+        self:DrawText(T("UI_PRESS_ENTER"), Vector2D(cx - 128, cy + 76), MONO, 17, C_ORANGE)
         return
     end
 
     -- ── HUD en jeu ────────────────────────────────────────────────────────────
-    self:DrawText("SCORE >> " .. fmtScore(player:GetValue("Score", 0)), Vector2D(30, 28), MONO, 14, C_CYAN)
+    self:DrawText(T("UI_SCORE_HUD", fmtScore(player:GetValue("Score", 0))), Vector2D(30, 28), MONO, 14, C_CYAN)
 
     local leaderboard = {}
     for _, v in ipairs(Player.GetAll()) do
@@ -88,7 +88,7 @@ hud:Subscribe("Update", function(self, width, height)
 
     local lx = width - 215
     local ly = 22
-    self:DrawText("[ SNAKE  v1.0 ]",  Vector2D(lx, ly),      MONO, 12, C_PURPLE)
+    self:DrawText(T("UI_LB_TITLE"),     Vector2D(lx, ly),      MONO, 12, C_PURPLE)
     self:DrawText("────────────────", Vector2D(lx, ly + 17),  MONO, 11, C_PINK)
     for k, v in ipairs(leaderboard) do
         if k > 5 then break end
@@ -121,5 +121,5 @@ Input.Bind("Rejouer", InputEvent.Pressed, function()
 end)
 
 Events.SubscribeRemote("Snake:Eat", function()
-    local eat_sound = Sound(Vector(), "nanos-quenk-snake-asset::eat", true, true, SoundType.SFX, 1, 1)
+    local eat_sound = Sound(Vector(), "nanos-quenk-snake-asset::eat", true, true, SoundType.SFX, 0.5, 0.5)
 end)

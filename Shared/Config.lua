@@ -1,3 +1,5 @@
+LANG = "en"                  -- language: "fr" or "en"
+
 MAP_SIZE = 5000              -- half-extents for food spawn area
 
 SNAKE_SPEED = 900            -- initial movement speed (units/sec)

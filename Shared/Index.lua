@@ -9,5 +9,6 @@ PLAYER_DIR_LEFT = 1
 PLAYER_DIR_RIGHT = 2
 
 Package.Require("Config.lua")
+Package.Require("Translations.lua")
 Package.Require("SnakePlayer.lua")
 Package.Require("SnakeClass.lua")

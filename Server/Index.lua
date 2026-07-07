@@ -39,10 +39,10 @@ local function spawnPlayerSnake(player)
         elseif other:GetValue("pQueue") ~= player then
             local ownerPlayer = other:GetValue("pQueue")
             if ownerPlayer == nil then return end
-            Chat.BroadcastMessage("Le joueur <blue>" .. player:GetName() .. "</> a mangé <blue>" .. ownerPlayer:GetName() .. "</> !")
+            Chat.BroadcastMessage(T("CHAT_PLAYER_ATE", player:GetName(), ownerPlayer:GetName()))
             killPlayer(player)
         else
-            Chat.BroadcastMessage("<blue>" .. player:GetName() .. "</> s'est mordu la queue !")
+            Chat.BroadcastMessage(T("CHAT_SELF_BITE", player:GetName()))
             killPlayer(player)
         end
     end)
@@ -84,7 +84,7 @@ Player.Subscribe("Spawn", function(player)
     local accountId = player:GetAccountID()
     local bestScore = GetPlayerBestScore(accountId)
     player:SetValue("BestScore", bestScore, true)
-    Chat.BroadcastMessage("Le joueur <blue>" .. player:GetName() .. "</> a rejoint la partie !")
+    Chat.BroadcastMessage(T("CHAT_PLAYER_JOINED", player:GetName()))
     -- Ne pas spawner le serpent ici — attendre que le client envoie Snake:StartGame
     Events.CallRemote("Snake:Ready", player)
 end)
