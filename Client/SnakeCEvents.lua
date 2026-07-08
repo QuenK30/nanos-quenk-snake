@@ -13,6 +13,11 @@ Input.Register("Turn Right", "D")
 Input.Bind("Turn Right", InputEvent.Pressed, function() Events.CallRemote("Snake:KeyPress", Reliability.Reliable, PLAYER_DIR_RIGHT) end)
 Input.Bind("Turn Right", InputEvent.Released, function() Events.CallRemote("Snake:KeyRelease", Reliability.Reliable, PLAYER_DIR_RIGHT) end)
 
+if DEBUG_MODE then
+    Input.Register("Debug Add Score", "U")
+    Input.Bind("Debug Add Score", InputEvent.Pressed, function() Events.CallRemote("Snake:DebugAddScore", Reliability.Reliable) end)
+end
+
 -- Pre-calculated once — avoids allocating new Vector/Rotator every Tick frame
 local CAM_OFFSET = Vector(CAM_FORWARD_OFFSET, 0, CAM_HEIGHT)
 local CAM_ROT = Rotator(CAM_PITCH, 0, 0)

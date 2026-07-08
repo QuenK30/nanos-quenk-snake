@@ -18,4 +18,5 @@ TRANSLATIONS_FR = {
     -- HUD en jeu
     UI_SCORE_HUD = "SCORE >> {1}",
     UI_LB_TITLE  = "[ SNAKE  v1.0 ]",
+    UI_EAT_POPUP = "+1",
 }

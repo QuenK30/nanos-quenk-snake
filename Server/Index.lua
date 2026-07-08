@@ -80,6 +80,13 @@ Events.SubscribeRemote("Snake:Respawn", function(player)
     spawnPlayerSnake(player)
 end)
 
+Events.SubscribeRemote("Snake:DebugAddScore", function(player)
+    if not DEBUG_MODE then return end
+    local head = player:GetValue("Head")
+    if not head or not head:IsValid() then return end
+    addScore(player, head)
+end)
+
 Player.Subscribe("Spawn", function(player)
     local accountId = player:GetAccountID()
     local bestScore = GetPlayerBestScore(accountId)

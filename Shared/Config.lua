@@ -1,5 +1,7 @@
 LANG = "en"                  -- language: "fr" or "en"
 
+DEBUG_MODE = true           -- enables debug tools (e.g. "U" key to self-add score/tail)
+
 MAP_SIZE = 5000              -- half-extents for food spawn area
 
 SNAKE_SPEED = 900            -- initial movement speed (units/sec)
