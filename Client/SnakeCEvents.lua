@@ -5,13 +5,11 @@
     Author: QuenK
 ]]--
 
-Input.Register("Turn Left", "Q")
-Input.Bind("Turn Left", InputEvent.Pressed, function() Events.CallRemote("Snake:KeyPress", Reliability.Reliable, PLAYER_DIR_LEFT) end)
-Input.Bind("Turn Left", InputEvent.Released, function() Events.CallRemote("Snake:KeyRelease", Reliability.Reliable, PLAYER_DIR_LEFT) end)
+Input.Bind("MoveLeft", InputEvent.Pressed, function() Events.CallRemote("Snake:KeyPress", Reliability.Reliable, PLAYER_DIR_LEFT) end)
+Input.Bind("MoveLeft", InputEvent.Released, function() Events.CallRemote("Snake:KeyRelease", Reliability.Reliable, PLAYER_DIR_LEFT) end)
 
-Input.Register("Turn Right", "D")
-Input.Bind("Turn Right", InputEvent.Pressed, function() Events.CallRemote("Snake:KeyPress", Reliability.Reliable, PLAYER_DIR_RIGHT) end)
-Input.Bind("Turn Right", InputEvent.Released, function() Events.CallRemote("Snake:KeyRelease", Reliability.Reliable, PLAYER_DIR_RIGHT) end)
+Input.Bind("MoveRight", InputEvent.Pressed, function() Events.CallRemote("Snake:KeyPress", Reliability.Reliable, PLAYER_DIR_RIGHT) end)
+Input.Bind("MoveRight", InputEvent.Released, function() Events.CallRemote("Snake:KeyRelease", Reliability.Reliable, PLAYER_DIR_RIGHT) end)
 
 if DEBUG_MODE then
     Input.Register("Debug Add Score", "U")
